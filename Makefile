@@ -1,5 +1,5 @@
 CC=gcc
-FLAGS=-Wall -Wextra -std=c11 -pedantic -lm -lGL -lX11 -lglfw 
+FLAGS=-Wall -Wextra -Werror -std=c11 -pedantic -lm -lGL -lX11 -lglfw 
 
 main:
 	$(CC) $(FLAGS) main.c -o main
