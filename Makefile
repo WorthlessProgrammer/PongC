@@ -5,6 +5,5 @@ LINK=-lm -lGL -lX11 -lglfw
 
 $(NAME):
 	$(CC) $(FLAGS) $(LINK) main.c -o main
-
 clear:
 	rm main
