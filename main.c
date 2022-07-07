@@ -1,11 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define GLFW_INCLUDE_GLEXT 
-#include <glew-2.2.0/includes/GL/glew3.h>
+#include <GLFW/glfw3.h>
+#include <GL/gl.h>
+
+#define WIDTH 800
+#define HEIGTH 200
 
 int main(int argc, char **argv)
 {
+	if (!glfwInit())
+	{
+		fprintf(stderr, "ERROR: Could not load GLFW3");
+	}
 	return 0;
 }
 
