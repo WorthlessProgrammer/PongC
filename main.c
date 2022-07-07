@@ -20,7 +20,6 @@ int main(void)
 	window = glfwCreateWindow(WIDTH, HEIGTH, "PongC", NULL, NULL);
 
 	glfwMakeContextCurrent(window);
-	
 
 	while(true)
 	{
