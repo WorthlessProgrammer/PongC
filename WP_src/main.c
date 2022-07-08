@@ -53,7 +53,7 @@ int main(void)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		quit = glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS; 
+		quit = glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS; 
 	}
 
 	glfwTerminate();
