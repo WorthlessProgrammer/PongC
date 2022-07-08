@@ -7,3 +7,4 @@ $(NAME):
 	$(CC) $(FLAGS) $(LINK) main.c -o main
 clear:
 	rm main
+re: clear $(NAME)
