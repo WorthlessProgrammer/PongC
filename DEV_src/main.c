@@ -19,27 +19,9 @@
 #define RECT_LENGTH 0.5
  
 //float posX = RECT_TOP_LEFT_X + RECT_WIDTH/2, posY = RECT_TOP_LEFT_Y / RECT_LENGTH/2;
-float posX = 0, posY = 0, posZ = 0;
+float posX = 0, posY = 0;
+//posZ = 0;
 float move_unit = 0.1f; //move
-
-/*
-GLfloat rotation = 90.0;
-void reshape(int width, int heigth){
-    //window ro reshape when made it bigger or smaller
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    //clip the windows so its shortest side is 2.0
-    if (width < heigth) {
-        glOrtho(-2.0, 2.0, -2.0 * (GLfloat)heigth / (GLfloat)width, 2.0 * (GLfloat)heigth / (GLfloat)width, 2.0, 2.0);
-    }
-    else{
-        glOrtho(-2.0, 2.0, -2.0 * (GLfloat)width / (GLfloat)heigth, 2.0 * (GLfloat)width / (GLfloat)heigth,2.0 , 2.0);
-    }
-    // set viewport to use the entire new window
-    glViewport(0, 0, width, heigth);
-}*/
 
 void keyboardown(int key, int x, int y)
 {
@@ -48,11 +30,13 @@ void keyboardown(int key, int x, int y)
 
     switch (key){
         case GLUT_KEY_UP:
-            posY+=move_unit;;
+			if (posY + 1 + move_unit <= 1)
+				posY+=move_unit;;
             break;
 
         case GLUT_KEY_DOWN:
-            posY-=move_unit;;
+			if (posY + RECT_LENGTH >= -1)
+				posY-=move_unit;
         break;
 
         default:
@@ -90,10 +74,10 @@ void display()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glPushMatrix();
-	glTranslatef(posX, posY, posZ);
+	glTranslatef(posX, posY, 0);
 	rect();
 	glPopMatrix();
-	glFlush();
+	glutSwapBuffers();
 }
 
 void init()
@@ -105,7 +89,7 @@ void init()
 int main(int argc, char** argv) 
 {										  
     glutInit(&argc, argv);               // Initialize GLUT and
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);    // Use single color buffer and no depth buffer.
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);    // Use single color buffer and no depth buffer.
     glutInitWindowSize(WIDTH, HEIGHT);   // Size of display area, in pixels.
     glutInitWindowPosition(WIN_POS_X, WIN_POS_Y);     // Location of window in screen coordinates.
     glutCreateWindow("PongC");           // Parameter is window title. 
