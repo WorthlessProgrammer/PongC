@@ -81,7 +81,7 @@ void keyboard_handler(unsigned char key, int x, int y)
 
     switch (key) 
     {
-		case 'q': {printf("%d %d", (int) 'e', (int) 'd'); exit(0); break;} //q
+		case 'q': {exit(0); break;} //quit
 		case 's': {lrect_y = clampf(lrect_y - RECT_STEP); break;} //S
 		case 'w': {lrect_y = clampf(lrect_y + RECT_STEP); break;} //w
 		case 'd': {rrect_y = clampf(rrect_y - RECT_STEP); break;} //D
