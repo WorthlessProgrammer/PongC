@@ -1,61 +1,57 @@
+#include <GL/freeglut_std.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
 #include <GL/gl.h>
-#include <GLFW/glfw3.h>
+#include <GL/freeglut.h>   
 
 #define WIDTH 800
-#define HEIGTH 600
-
-//check OpenGL ERROR code.
-void cglec(int code)
+#define HEIGHT 600
+ 
+void keyboard_handler(unsigned char key, int x, int y)
 {
-	if (code < 0)
+	(void) x;
+	(void) y;
+
+    if(key == (unsigned char) 'q')
 	{
-		fprintf(stderr, "ERROR");
-		exit(1);
+        exit(0);
 	}
 }
 
-//check OpenGL pointer.
-void *cglp(void *ptr)
-{
-	if (!ptr)
-	{
-		fprintf(stderr, "ERROR");
-		exit(1);
-	}
-	return ptr;
+void display() {  
+ 
+    glClearColor(0, 0, 0, 1);  // (In fact, this is the default.)
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    glBegin(GL_TRIANGLES);
+    glColor3f(1, 0, 0); // red
+    glVertex2f(-0.8, -0.8);
+    glColor3f(0, 1, 0); // green
+    glVertex2f(0.8, -0.8);
+    glColor3f(0, 0, 1); // blue
+    glVertex2f(0, 0.9);
+    glEnd(); 
+    
+    glutSwapBuffers(); // Required to copy color buffer onto the screen.
+ 
 }
 
-int main(void)
-{
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Queremos OpenGL 3.3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	if (!glfwInit())
-	{
-		fprintf(stderr, "ERROR: Could not load GLFW3\n");
-		exit(1);
-	}
+int main( int argc, char** argv ) {  // Initialize GLUT and 
 
-	GLFWwindow* window;
-	window = cglp(glfwCreateWindow(WIDTH, HEIGTH, "PongC", NULL, NULL));
-	
-	glfwMakeContextCurrent(window);
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE);    // Use single color buffer and no depth buffer.
+    glutInitWindowSize(WIDTH, HEIGHT);   // Size of display area, in pixels.
+    glutInitWindowPosition(100,100);     // Location of window in screen coordinates.
+    glutCreateWindow("PongC");           // Parameter is window title.
+    glutDisplayFunc(display);            // Called when the window needs to be redrawn.
+	glutKeyboardFunc(keyboard_handler);
 
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-	
-	bool quit = false;
-	while(!quit)
-	{
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+    glutMainLoop(); // Run the event loop!  This function does not return.
+                    // Program ends when user closes the window.
+    return 0;
 
-		quit = glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS; 
-	}
-
-	glfwTerminate();
-	return 0;
 }
+
