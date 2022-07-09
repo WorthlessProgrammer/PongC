@@ -23,6 +23,8 @@
 #define BALL_CX 0.0f 
 #define BALL_CY 0.0f
 #define BALL_SPEED 0.007f
+#define BALL_RAD 0.02f
+#define BALL_DEF 20
 #define PI 3.1415926f
 
 #define FPS 1000 / 60
@@ -59,19 +61,16 @@ void render_rect_uniform_color(Rectangle rect)
 
 void render_circle_uniform_color(float x, float y)
 {
-	GLfloat radius;
-	int triangleAmount = 20;
 	GLfloat twicePi = 2.0f * PI;
 
 	glBegin(GL_TRIANGLE_FAN);
 	glColor3f(0, 1, 0);
-	radius = 0.02f;
 
 	glVertex2f(x, y); // center of circle
-	for(int i = 0; i <= triangleAmount; i++) {
+	for(int i = 0; i <= BALL_DEF; i++) {
 		glVertex2f(
-			x + (radius*cos(i * twicePi / triangleAmount)),
-			y + (radius*2*sin(i * twicePi / triangleAmount))
+			x + (BALL_RAD*cos(i * twicePi / BALL_DEF)),
+			y + (BALL_RAD*2*sin(i * twicePi / BALL_DEF))
 			);
 	}
 	glEnd();
