@@ -10,8 +10,8 @@ make
 ``` 
 
 ## References
-Glut 1st triangle example: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwj5yseVsen4AhXBgM4BHactAQEQFnoECAoQAQ&url=https%3A%2F%2Fmath.hws.edu%2Fgraphicsbook%2Fsource%2Fglut%2Ffirst-triangle.c&usg=AOvVaw2jgSd2EHG9RkExQg6zqYHO
-https://stackoverflow.com/questions/13150393/opengl-2d-moving-and-object-by-1-unit
+- Glut 1st triangle example: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwj5yseVsen4AhXBgM4BHactAQEQFnoECAoQAQ&url=https%3A%2F%2Fmath.hws.edu%2Fgraphicsbook%2Fsource%2Fglut%2Ffirst-triangle.c&usg=AOvVaw2jgSd2EHG9RkExQg6zqYHO
+- Glut movement of rectangle: https://stackoverflow.com/questions/13150393/opengl-2d-moving-and-object-by-1-unit
 
 ## TODO
 - [] Implement the game.
