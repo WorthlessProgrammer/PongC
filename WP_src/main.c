@@ -69,25 +69,18 @@ void display()
 	Rectangle l = make_right_rect(); 
 
     glBegin(GL_POLYGON);
-    glColor3f(1, 0, 0); // red 
-    glVertex2f(r.x, r.y);
     glColor3f(0, 1, 0); // green
+	glVertex2f(r.x, r.y);
     glVertex2f(r.x + r.width, r.y);
-    glColor3f(0, 0, 1); // blue
 	glVertex2f(r.x + r.width, r.y - r.length);
-    glColor3f(1, 1, 1); // all
 	glVertex2f(r.x, r.y - r.length); 
 	glEnd(); 
-	printf("%f\n", l.x);
 
-    glBegin(GL_POLYGON);
-    glColor3f(1, 0, 0); // red 
-    glVertex2f(l.x, l.y);
+    glBegin(GL_POLYGON); 
     glColor3f(0, 1, 0); // green
+	glVertex2f(l.x, l.y);
     glVertex2f(l.x + l.width, l.y);
-    glColor3f(0, 0, 1); // blue
 	glVertex2f(l.x + l.width, l.y - l.length);
-    glColor3f(1, 1, 1); // all
 	glVertex2f(l.x, l.y - l.length); 
 	glEnd(); 
     
