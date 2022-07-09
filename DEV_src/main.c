@@ -57,7 +57,7 @@ void render_rect_uniform_color(Rectangle rect)
 void circle(float x, float y)
 {
     GLfloat radius;
-    int triangleAmount = 35;
+    int triangleAmount = 20;
     GLfloat twicePi = 2.0 * PI;
 
         glBegin(GL_TRIANGLE_FAN);
@@ -78,6 +78,28 @@ static float circ_x = 0;
 static float circ_y = 0;
 static float lrect_y = RECT_TOP_LEFT_Y;
 static float rrect_y = RECT_TOP_LEFT_Y;
+
+void circ_mv(void)
+{
+	static bool is_right = false;
+	static bool is_left = false;
+
+	if (circ_x >= 1)
+		is_right = true;
+	if (circ_x <= -1)
+		is_left = true;
+	if (!is_right)
+		circ_x += 0.007;
+	else if(is_right && !is_left)
+		circ_x -= 0.007;
+	else
+	{
+		is_right = false;
+		is_left = false;
+	}
+	glutPostRedisplay();
+}
+
 void display() 
 { 
     glClearColor(0, 0, 0, 1);  
@@ -86,6 +108,7 @@ void display()
     Rectangle r = make_rect(RECT_TOP_LEFT_X, lrect_y);
     Rectangle l = make_rect(-1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y); 
 
+	circ_mv();
 	circle(circ_x, circ_y);
 
     render_rect_uniform_color(r);
@@ -126,7 +149,7 @@ int main(int argc, char** argv)
     glutInitWindowSize(WIDTH, HEIGHT);		    // Size of display area, in pixels.
     glutInitWindowPosition(WIN_POS_X, WIN_POS_Y);   // Location of window in screen coordinates.
     glutCreateWindow("PongC");			    // Parameter is window title. 
-    glutDisplayFunc(display);			    // Called when the window needs to be redrawn.
+    glutDisplayFunc(display);				// Called when the window needs to be redrawn.
     glutKeyboardFunc(keyboard_handler);
 
     glutMainLoop(); // Run the event loop!  This function does not return.
