@@ -13,11 +13,42 @@
 #define WIN_POS_Y 100
 
 #define RECT_OFFSET 0.05
-#define RECT_TOP_LEFT_X RECT_OFFSET - 1
+#define RECT_TOP_LEFT_X (RECT_OFFSET - 1)
 #define RECT_TOP_LEFT_Y 1
 #define RECT_WIDTH 0.075
 #define RECT_LENGTH 0.5
- 
+
+typedef struct {
+	float x;
+	float y;
+	float width;
+	float length;
+} Rectangle;
+
+Rectangle make_left_rect()
+{
+	Rectangle r = {
+		.x = RECT_TOP_LEFT_X,  
+		.y = RECT_TOP_LEFT_Y,
+		.width = RECT_WIDTH,
+		.length = RECT_LENGTH
+	};
+	
+	return r;
+}
+
+Rectangle make_right_rect()
+{
+	Rectangle r = {
+		.x = -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH,   
+		.y = RECT_TOP_LEFT_Y,
+		.width = RECT_WIDTH,
+		.length = RECT_LENGTH
+	};
+	
+	return r;
+}
+
 void keyboard_handler(unsigned char key, int x, int y)
 {
 	(void) x;
@@ -31,22 +62,36 @@ void keyboard_handler(unsigned char key, int x, int y)
 
 void display() 
 { 
- 
     glClearColor(0, 0, 0, 1);  // (In fact, this is the default.)
     glClear(GL_COLOR_BUFFER_BIT);
-    
+
+	Rectangle r = make_left_rect();
+	Rectangle l = make_right_rect(); 
+
     glBegin(GL_POLYGON);
     glColor3f(1, 0, 0); // red 
-    glVertex2f(RECT_TOP_LEFT_X, RECT_TOP_LEFT_Y);
+    glVertex2f(r.x, r.y);
     glColor3f(0, 1, 0); // green
-    glVertex2f(RECT_TOP_LEFT_X + RECT_WIDTH, RECT_TOP_LEFT_Y);
+    glVertex2f(r.x + r.width, r.y);
     glColor3f(0, 0, 1); // blue
-	glVertex2f(RECT_TOP_LEFT_X + RECT_WIDTH, RECT_TOP_LEFT_Y - RECT_LENGTH);
+	glVertex2f(r.x + r.width, r.y - r.length);
     glColor3f(1, 1, 1); // all
-	glVertex2f(RECT_TOP_LEFT_X, RECT_TOP_LEFT_Y - RECT_LENGTH); 
+	glVertex2f(r.x, r.y - r.length); 
 	glEnd(); 
-    	
-    glutSwapBuffers(); // Required to copy color buffer onto the screen.
+	printf("%f\n", l.x);
+
+    glBegin(GL_POLYGON);
+    glColor3f(1, 0, 0); // red 
+    glVertex2f(l.x, l.y);
+    glColor3f(0, 1, 0); // green
+    glVertex2f(l.x + l.width, l.y);
+    glColor3f(0, 0, 1); // blue
+	glVertex2f(l.x + l.width, l.y - l.length);
+    glColor3f(1, 1, 1); // all
+	glVertex2f(l.x, l.y - l.length); 
+	glEnd(); 
+    
+	glutSwapBuffers(); // Required to copy color buffer onto the screen.
 }
 
 int main(int argc, char** argv) 
