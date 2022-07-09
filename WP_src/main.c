@@ -55,11 +55,11 @@ void render_rect_uniform_color(Rectangle rect)
 {
     glBegin(GL_POLYGON);
     glColor3f(0, 1, 0); // green
-	glVertex2f(rect.x, rect.y);
+    glVertex2f(rect.x, rect.y);
     glVertex2f(rect.x + rect.width, rect.y);
-	glVertex2f(rect.x + rect.width, rect.y - rect.length);
-	glVertex2f(rect.x, rect.y - rect.length); 
-	glEnd(); 
+    glVertex2f(rect.x + rect.width, rect.y - rect.length);
+    glVertex2f(rect.x, rect.y - rect.length); 
+    glEnd(); 
 }
 
 void display() 
@@ -67,27 +67,26 @@ void display()
     glClearColor(0, 0, 0, 1);  
     glClear(GL_COLOR_BUFFER_BIT);
 
-	Rectangle r = make_rect(RECT_TOP_LEFT_X, RECT_TOP_LEFT_Y);
-	Rectangle l = make_rect(-1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, RECT_TOP_LEFT_Y); 
+    Rectangle r = make_rect(RECT_TOP_LEFT_X, RECT_TOP_LEFT_Y);
+    Rectangle l = make_rect(-1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, RECT_TOP_LEFT_Y); 
     
-	render_rect_uniform_color(r);
-	render_rect_uniform_color(l);
-
-	glutSwapBuffers(); 
+    render_rect_uniform_color(r);
+    render_rect_uniform_color(l);
+    glutSwapBuffers(); 
 }
 
 int main(int argc, char** argv) 
 {										  
-    glutInit(&argc, argv);				            // Initialize GLUT and
+    glutInit(&argc, argv);			    // Initialize GLUT and
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);    // Use single color buffer and no depth buffer.
-    glutInitWindowSize(WIDTH, HEIGHT);			    // Size of display area, in pixels.
+    glutInitWindowSize(WIDTH, HEIGHT);		    // Size of display area, in pixels.
     glutInitWindowPosition(WIN_POS_X, WIN_POS_Y);   // Location of window in screen coordinates.
-    glutCreateWindow("PongC");						// Parameter is window title. 
-	glutDisplayFunc(display);						// Called when the window needs to be redrawn.
-	glutKeyboardFunc(keyboard_handler);
+    glutCreateWindow("PongC");			    // Parameter is window title. 
+    glutDisplayFunc(display);			    // Called when the window needs to be redrawn.
+    glutKeyboardFunc(keyboard_handler);
 
-	glutMainLoop(); // Run the event loop!  This function does not return.
-					// Program ends when user closes the window.
-	return 0;
+    glutMainLoop();  // Run the event loop!  This function does not return.
+		     // Program ends when user closes the window.
+    return 0;
 }
 
