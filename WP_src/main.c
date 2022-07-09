@@ -86,14 +86,24 @@ void circ_mv(void)
 	static bool is_right = false;
 	static bool is_left = false;
 
-	if (circ_x >= 1) is_right = true;
-	if (circ_x <= -1) is_left = true;
+	if (circ_x - BALL_RAD <= -1.0f) 
+	{
+		circ_x -= BALL_SPEED;
+		is_left = true;
+	}
+	if (circ_x + BALL_RAD >= 1.0f)
+	{
+		circ_x += BALL_SPEED;
+		is_right = true;
+	}
+	if (circ_y + BALL_RAD >= 1.0f) circ_y -= BALL_SPEED;
+	if (circ_y - BALL_RAD <= -1.0f) circ_y += BALL_SPEED;
 	if (!is_right) circ_x += BALL_SPEED;
 	else if (is_right && !is_left) circ_x -= BALL_SPEED;
 	else
 	{
-		is_right = false;
-		is_left = false;
+		is_left = false; 
+		is_right = false;	
 	}
 	glutPostRedisplay();
 }
