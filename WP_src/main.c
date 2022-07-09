@@ -73,10 +73,10 @@ void keyboard_handler(unsigned char key, int x, int y)
 
     switch (key) 
     {
-	case 113: {exit(0); break;} //q
-	case 115: {rect_y += RECT_STEP; break;} //w
-	case 119: {rect_y -= RECT_STEP; break;} //s
-	default: break;
+		case 113: {exit(0); break;} //q
+		case 115: {rect_y -= RECT_STEP; break;} //s
+		case 119: {rect_y += RECT_STEP; break;} //w
+		default: break;
     }
 
     glutPostRedisplay();
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     glutKeyboardFunc(keyboard_handler);
 
     glutMainLoop(); // Run the event loop!  This function does not return.
-		    // Program ends when user closes the window.
+					// Program ends when user closes the window.
     return 0;
 }
 
