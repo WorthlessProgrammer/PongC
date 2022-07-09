@@ -25,23 +25,11 @@ typedef struct {
 	float length;
 } Rectangle;
 
-Rectangle make_left_rect()
+Rectangle make_rect(float tl_x, float tl_y)
 {
 	Rectangle r = {
-		.x = RECT_TOP_LEFT_X,  
-		.y = RECT_TOP_LEFT_Y,
-		.width = RECT_WIDTH,
-		.length = RECT_LENGTH
-	};
-	
-	return r;
-}
-
-Rectangle make_right_rect()
-{
-	Rectangle r = {
-		.x = -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH,   
-		.y = RECT_TOP_LEFT_Y,
+		.x = tl_x,  
+		.y = tl_y,
 		.width = RECT_WIDTH,
 		.length = RECT_LENGTH
 	};
@@ -54,51 +42,51 @@ void keyboard_handler(unsigned char key, int x, int y)
 	(void) x;
 	(void) y;
 
-    if (key == (unsigned char) 'q')
+	switch (key) 
 	{
-        exit(0);
+		case 113: {exit(0); break;} //q
+		case 115: {exit(0); break;} //w
+		case 119: {exit(0); break;} //s
+		default: break;
 	}
+}
+
+void render_rect_uniform_color(Rectangle rect)
+{
+    glBegin(GL_POLYGON);
+    glColor3f(0, 1, 0); // green
+    glVertex2f(rect.x, rect.y);
+    glVertex2f(rect.x + rect.width, rect.y);
+    glVertex2f(rect.x + rect.width, rect.y - rect.length);
+    glVertex2f(rect.x, rect.y - rect.length); 
+    glEnd(); 
 }
 
 void display() 
 { 
-    glClearColor(0, 0, 0, 1);  // (In fact, this is the default.)
+    glClearColor(0, 0, 0, 1);  
     glClear(GL_COLOR_BUFFER_BIT);
 
-	Rectangle r = make_left_rect();
-	Rectangle l = make_right_rect(); 
-
-    glBegin(GL_POLYGON);
-    glColor3f(0, 1, 0); // green
-	glVertex2f(r.x, r.y);
-    glVertex2f(r.x + r.width, r.y);
-	glVertex2f(r.x + r.width, r.y - r.length);
-	glVertex2f(r.x, r.y - r.length); 
-	glEnd(); 
-
-    glBegin(GL_POLYGON); 
-    glColor3f(0, 1, 0); // green
-	glVertex2f(l.x, l.y);
-    glVertex2f(l.x + l.width, l.y);
-	glVertex2f(l.x + l.width, l.y - l.length);
-	glVertex2f(l.x, l.y - l.length); 
-	glEnd(); 
+    Rectangle r = make_rect(RECT_TOP_LEFT_X, RECT_TOP_LEFT_Y);
+    Rectangle l = make_rect(-1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, RECT_TOP_LEFT_Y); 
     
-	glutSwapBuffers(); // Required to copy color buffer onto the screen.
+    render_rect_uniform_color(r);
+    render_rect_uniform_color(l);
+    glutSwapBuffers(); 
 }
 
 int main(int argc, char** argv) 
 {										  
-    glutInit(&argc, argv);               // Initialize GLUT and
+    glutInit(&argc, argv);			    // Initialize GLUT and
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);    // Use single color buffer and no depth buffer.
-    glutInitWindowSize(WIDTH, HEIGHT);   // Size of display area, in pixels.
-    glutInitWindowPosition(WIN_POS_X, WIN_POS_Y);     // Location of window in screen coordinates.
-    glutCreateWindow("PongC");           // Parameter is window title. 
-	glutDisplayFunc(display);            // Called when the window needs to be redrawn.
-	glutKeyboardFunc(keyboard_handler);
+    glutInitWindowSize(WIDTH, HEIGHT);		    // Size of display area, in pixels.
+    glutInitWindowPosition(WIN_POS_X, WIN_POS_Y);   // Location of window in screen coordinates.
+    glutCreateWindow("PongC");			    // Parameter is window title. 
+    glutDisplayFunc(display);			    // Called when the window needs to be redrawn.
+    glutKeyboardFunc(keyboard_handler);
 
-	glutMainLoop(); // Run the event loop!  This function does not return.
-					// Program ends when user closes the window.
-	return 0;
+    glutMainLoop();  // Run the event loop!  This function does not return.
+		     // Program ends when user closes the window.
+    return 0;
 }
 
