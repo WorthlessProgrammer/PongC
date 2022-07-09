@@ -22,6 +22,7 @@
 
 #define BALL_CX 0.0f 
 #define BALL_CY 0.0f
+#define BALL_SPEED 0.007f
 #define PI 3.1415926f
 
 #define FPS 1000 / 60
@@ -56,7 +57,7 @@ void render_rect_uniform_color(Rectangle rect)
 	glEnd(); 
 }
 
-void circle(float x, float y)
+void render_circle_uniform_color(float x, float y)
 {
 	GLfloat radius;
 	int triangleAmount = 20;
@@ -88,8 +89,8 @@ void circ_mv(void)
 
 	if (circ_x >= 1) is_right = true;
 	if (circ_x <= -1) is_left = true;
-	if (!is_right) circ_x += 0.007f;
-	else if (is_right && !is_left) circ_x -= 0.007;
+	if (!is_right) circ_x += BALL_SPEED;
+	else if (is_right && !is_left) circ_x -= BALL_SPEED;
 	else
 	{
 		is_right = false;
@@ -107,7 +108,7 @@ void display()
 	Rectangle l = make_rect(-1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y); 
 
 	circ_mv();
-	circle(circ_x, circ_y);
+	render_circle_uniform_color(circ_x, circ_y);
 
 	render_rect_uniform_color(r);
 	render_rect_uniform_color(l);
