@@ -88,12 +88,12 @@ void circ_mv(void)
 
 	if (circ_x - BALL_RAD <= -1.0f) 
 	{
-		circ_x -= BALL_SPEED;
+		/* circ_x -= BALL_SPEED; */
 		is_left = true;
 	}
 	if (circ_x + BALL_RAD >= 1.0f)
 	{
-		circ_x += BALL_SPEED;
+		/* circ_x += BALL_SPEED; */
 		is_right = true;
 	}
 	if (circ_y + BALL_RAD >= 1.0f) circ_y -= BALL_SPEED;
