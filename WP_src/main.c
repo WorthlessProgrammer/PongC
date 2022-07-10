@@ -30,6 +30,27 @@
 #define FPS 1000 / 60
 
 typedef struct {
+	float cx;
+	float cy;
+	float r;
+	float dir_x;
+	float dir_y;
+} Ball;
+
+Ball make_ball(float bx, float by, float radius)
+{
+	Ball b = {
+		.cx = bx,
+		.cy = by, 
+		.r = radius,
+		.dir_x = 0.0f,
+		.dir_y = 0.0f
+	};
+
+	return b;
+}
+
+typedef struct {
 	float x;
 	float y;
 	float width;
@@ -59,18 +80,18 @@ void render_rect_uniform_color(Rectangle rect)
 	glEnd(); 
 }
 
-void render_circle_uniform_color(float x, float y)
+void render_circle_uniform_color(Ball ball)
 {
 	GLfloat twicePi = 2.0f * PI;
 
 	glBegin(GL_TRIANGLE_FAN);
 	glColor3f(0, 1, 0);
 
-	glVertex2f(x, y); // center of circle
+	glVertex2f(ball.cx, ball.cy); // center of circle
 	for(int i = 0; i <= BALL_DEF; i++) {
 		glVertex2f(
-			x + (BALL_RAD*cos(i * twicePi / BALL_DEF)),
-			y + (BALL_RAD*2*sin(i * twicePi / BALL_DEF))
+			ball.cx + (BALL_RAD*cos(i * twicePi / BALL_DEF)),
+			ball.cy + (BALL_RAD*2*sin(i * twicePi / BALL_DEF))
 			);
 	}
 	glEnd();
@@ -116,8 +137,10 @@ void display()
 	Rectangle r = make_rect(RECT_TOP_LEFT_X, lrect_y);
 	Rectangle l = make_rect(-1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y); 
 
+	Ball game_ball = make_ball(circ_x, circ_y, BALL_RAD);
+
+	render_circle_uniform_color(game_ball);
 	circ_mv();
-	render_circle_uniform_color(circ_x, circ_y);
 
 	render_rect_uniform_color(r);
 	render_rect_uniform_color(l);
