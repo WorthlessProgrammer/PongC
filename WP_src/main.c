@@ -25,7 +25,7 @@
 #define BALL_CY 0.0f
 #define BALL_SPEED 0.007f
 #define BALL_RAD 0.02f
-#define BALL_DIR_X 0.30f
+#define BALL_DIR_X -0.30f
 #define BALL_DIR_Y 0.70f
 #define BALL_DEF 20
 #define PI 3.1415926f
@@ -106,10 +106,18 @@ static float circ_dy = BALL_DIR_Y;
 static float lrect_y = RECT_TOP_LEFT_Y;
 static float rrect_y = RECT_TOP_LEFT_Y;
 
-/* bool ball_has_collision_with_rect(Ball *b) */
-/* { */
-	
-/* } */
+bool ball_has_collision_with_rect(Ball *b)
+{
+	if (circ_x + b->r >= -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH)
+	{	
+		if (rrect_y - RECT_LENGTH <= b->cy && b->cy <= rrect_y) return true;
+	} else if (circ_x - b->r <= RECT_TOP_LEFT_X + RECT_WIDTH) 
+	{
+		if (lrect_y - RECT_LENGTH <= b->cy && b->cy <= lrect_y) return true;
+	}
+
+	return false;
+}
 
 void circ_mv(Ball *b)
 {
@@ -126,7 +134,13 @@ void circ_mv(Ball *b)
 		circ_dy *= -1.0f;
 		circ_y += circ_dy*b->velocity;
 	}
-	/* if ball_has_collision_with_rect(); */
+	if (ball_has_collision_with_rect(b))
+	{
+		circ_dy *= -1.0f;
+		circ_dx *= -1.0f;
+		circ_y += circ_dy*b->velocity;
+		circ_x += circ_dx*b->velocity;	
+	}
 	
 	glutPostRedisplay();
 }
