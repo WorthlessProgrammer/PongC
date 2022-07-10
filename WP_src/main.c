@@ -25,7 +25,7 @@
 #define BALL_CY 0.0f
 #define BALL_SPEED 0.007f
 #define BALL_RAD 0.02f
-#define BALL_DIR_X -0.30f
+#define BALL_DIR_X 0.30f
 #define BALL_DIR_Y 0.70f
 #define BALL_DEF 20
 #define PI 3.1415926f
@@ -91,8 +91,8 @@ void render_circle_uniform_color(Ball ball)
 	glVertex2f(ball.cx, ball.cy); // center of circle
 	for(int i = 0; i <= BALL_DEF; i++) {
 		glVertex2f(
-			ball.cx + (BALL_RAD*cos(i * twicePi / BALL_DEF)),
-			ball.cy + (BALL_RAD*2*sin(i * twicePi / BALL_DEF))
+			ball.cx + (ball.r*cos(i * twicePi / BALL_DEF)),
+			ball.cy + (ball.r*2*sin(i * twicePi / BALL_DEF))
 			);
 	}
 	glEnd();
@@ -106,22 +106,28 @@ static float circ_dy = BALL_DIR_Y;
 static float lrect_y = RECT_TOP_LEFT_Y;
 static float rrect_y = RECT_TOP_LEFT_Y;
 
-void circ_mv(Ball b)
-{
-	circ_x += circ_dx*b.velocity;	
-	circ_y += circ_dy*b.velocity;
+/* bool ball_has_collision_with_rect(Ball *b) */
+/* { */
 	
-	if (circ_x + b.r >= 1.0f || circ_x - b.r <= -1.0f) 
+/* } */
+
+void circ_mv(Ball *b)
+{
+	circ_x += circ_dx*b->velocity;	
+	circ_y += circ_dy*b->velocity;
+	
+	if (circ_x + b->r >= 1.0f || circ_x - b->r <= -1.0f) 
 	{
 		circ_x = 0.0f;
 		circ_y = 0.0f;
 	}
-	if (circ_y + BALL_RAD >= 1.0f || circ_y - BALL_RAD <= -1.0f)
+	if (circ_y + b->r >= 1.0f || circ_y - b->r <= -1.0f)
 	{
 		circ_dy *= -1.0f;
-		circ_y += circ_dy*b.velocity;
+		circ_y += circ_dy*b->velocity;
 	}
-
+	/* if ball_has_collision_with_rect(); */
+	
 	glutPostRedisplay();
 }
 
@@ -139,7 +145,7 @@ void display()
 	render_rect_uniform_color(r);
 	render_rect_uniform_color(l);
 
-	circ_mv(game_ball);
+	circ_mv(&game_ball);
 
 	glutSwapBuffers(); 
 }
