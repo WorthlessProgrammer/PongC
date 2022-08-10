@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 /* #include <unistd.h> */
 #include <math.h>
 
@@ -25,8 +26,8 @@
 #define BALL_CY 0.0f
 #define BALL_SPEED 0.007f
 #define BALL_RAD 0.02f
-#define BALL_DIR_X -0.30f
-#define BALL_DIR_Y 0.70f
+#define BALL_DIR_X -0.3f
+#define BALL_DIR_Y 0.7f
 #define BALL_DEF 20
 #define PI 3.1415926f
 
@@ -102,19 +103,35 @@ static float circ_x = BALL_CX;
 static float circ_y = BALL_CY;
 static float circ_dx = BALL_DIR_X;
 static float circ_dy = BALL_DIR_Y;
+static bool ball_dead = false;
 
 static float lrect_y = RECT_TOP_LEFT_Y;
 static float rrect_y = RECT_TOP_LEFT_Y;
 
-bool ball_has_collision_with_rect(Ball *b)
+bool ball_has_x_collision_with_rect(Ball *b)
 {
 	if (circ_x + b->r >= -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH)
 	{	
 		if (rrect_y - RECT_LENGTH <= b->cy && b->cy <= rrect_y) return true;
+		return false;
 	} else if (circ_x - b->r <= RECT_TOP_LEFT_X + RECT_WIDTH) 
 	{
 		if (lrect_y - RECT_LENGTH <= b->cy && b->cy <= lrect_y) return true;
-	}
+		return false;
+	} 
+	
+	return false;
+}
+
+bool ball_has_y_collision_with_rect(Ball *b)
+{
+	if (circ_y - b->r <= lrect_y || circ_y + b->r <= lrect_y - RECT_LENGTH) 
+	{
+		if (circ_x > RECT_TOP_LEFT_X && circ_x < RECT_TOP_LEFT_X + RECT_WIDTH) return true;
+	} else if (circ_y - b->r <= rrect_y || circ_y + b->r <= rrect_y - RECT_LENGTH) 
+	{
+		if (circ_x < RECT_TOP_LEFT_X && circ_x > RECT_TOP_LEFT_X - RECT_WIDTH) return true;
+	} 
 
 	return false;
 }
@@ -128,20 +145,22 @@ void circ_mv(Ball *b)
 	{
 		circ_x = 0.0f;
 		circ_y = 0.0f;
+		ball_dead = true;
 	}
 	if (circ_y + b->r >= 1.0f || circ_y - b->r <= -1.0f)
 	{
 		circ_dy *= -1.0f;
 		circ_y += circ_dy*b->velocity;
 	}
-	if (ball_has_collision_with_rect(b))
+	if (ball_has_x_collision_with_rect(b))
+	{
+		circ_dx *= -1.0f;
+	}	
+	if (ball_has_y_collision_with_rect(b))
 	{
 		circ_dy *= -1.0f;
-		circ_dx *= -1.0f;
-		circ_y += circ_dy*b->velocity;
-		circ_x += circ_dx*b->velocity;	
 	}
-	
+
 	glutPostRedisplay();
 }
 
@@ -161,6 +180,13 @@ void display()
 
 	circ_mv(&game_ball);
 
+	if (ball_dead)
+	{
+		circ_dx = 0.0f;
+		circ_dy = 0.0f;
+		ball_dead = false;
+	}
+	
 	glutSwapBuffers(); 
 }
 
@@ -179,9 +205,9 @@ void keyboard_handler(unsigned char key, int x, int y)
 	switch (key) 
 	{
 		case 'q': {exit(0); break;} //quit
-		case 's': {lrect_y = clampf(lrect_y - RECT_STEP); break;} //S
-		case 'w': {lrect_y = clampf(lrect_y + RECT_STEP); break;} //w
-		case 'd': {rrect_y = clampf(rrect_y - RECT_STEP); break;} //D
+		case 's': {lrect_y = clampf(lrect_y - RECT_STEP); break;} //S Left Down
+		case 'w': {lrect_y = clampf(lrect_y + RECT_STEP); break;} //w Left Up
+		case 'd': {rrect_y = clampf(rrect_y - RECT_STEP); break;} //D Rrigh
 		case 'e': {rrect_y = clampf(rrect_y + RECT_STEP); break;} //E
 		default: break;
 	}
@@ -189,8 +215,16 @@ void keyboard_handler(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
+void init_random()
+{
+	time_t t;
+	srand((unsigned) time(&t));
+}
+
 int main(int argc, char** argv) 
-{										  
+{					
+	init_random();
+
 	glutInit(&argc, argv);				// Initialize GLUT and
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Use single color buffer and no depth buffer.
 	glutInitWindowSize(WIDTH, HEIGHT);			// Size of display area, in pixels.
