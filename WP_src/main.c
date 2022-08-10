@@ -103,7 +103,6 @@ static float circ_x = BALL_CX;
 static float circ_y = BALL_CY;
 static float circ_dx = BALL_DIR_X;
 static float circ_dy = BALL_DIR_Y;
-static bool ball_dead = false;
 
 static float lrect_y = RECT_TOP_LEFT_Y;
 static float rrect_y = RECT_TOP_LEFT_Y;
@@ -125,13 +124,13 @@ bool ball_has_x_collision_with_rect(Ball *b)
 
 bool ball_has_y_collision_with_rect(Ball *b)
 {
-	if (circ_y - b->r <= lrect_y || circ_y + b->r <= lrect_y - RECT_LENGTH) 
+	if (circ_y - b->r <= lrect_y + 0.1f || circ_y + b->r <= lrect_y - RECT_LENGTH-0.1f) 
 	{
 		if (circ_x > RECT_TOP_LEFT_X && circ_x < RECT_TOP_LEFT_X + RECT_WIDTH) return true;
-	} else if (circ_y - b->r <= rrect_y || circ_y + b->r <= rrect_y - RECT_LENGTH) 
+	} else if (circ_y - b->r <= rrect_y + 0.1f || circ_y + b->r <= rrect_y - RECT_LENGTH-0.1f) 
 	{
 		if (circ_x < RECT_TOP_LEFT_X && circ_x > RECT_TOP_LEFT_X - RECT_WIDTH) return true;
-	} 
+	}
 
 	return false;
 }
@@ -145,7 +144,6 @@ void circ_mv(Ball *b)
 	{
 		circ_x = 0.0f;
 		circ_y = 0.0f;
-		ball_dead = true;
 	}
 	if (circ_y + b->r >= 1.0f || circ_y - b->r <= -1.0f)
 	{
@@ -178,14 +176,7 @@ void display()
 	render_rect_uniform_color(r);
 	render_rect_uniform_color(l);
 
-	circ_mv(&game_ball);
-
-	if (ball_dead)
-	{
-		circ_dx = 0.0f;
-		circ_dy = 0.0f;
-		ball_dead = false;
-	}
+	circ_mv(&game_ball);		
 	
 	glutSwapBuffers(); 
 }
