@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+/* #include <unistd.h> */
 #include <math.h>
+#include <time.h>
 
 #include <GL/gl.h>
 #include <GL/freeglut.h>   
 #include <GL/freeglut_std.h>
-#include <time.h>
 
 #define WIDTH 960
 #define HEIGHT 480
@@ -23,10 +24,33 @@
 
 #define BALL_CX 0.0f 
 #define BALL_CY 0.0f
-#define PI 3.1415926f
+#define BALL_SPEED 0.02f
 #define BALL_RAD 0.02f
+#define BALL_DIR_X -0.30f
+#define BALL_DIR_Y 0.70f
+#define BALL_DEF 20
+#define PI 3.1415926f
 
 #define FPS 1000 / 60
+
+typedef struct {
+	float cx;
+	float cy;
+	float r;
+	float velocity;
+} Ball;
+
+Ball make_ball(float bx, float by, float radius, float v)
+{
+	Ball b = {
+		.cx = bx,
+		.cy = by, 
+		.r = radius,
+		.velocity = v
+	};
+
+	return b;
+}
 
 typedef struct {
 	float x;
@@ -58,21 +82,18 @@ void render_rect_uniform_color(Rectangle rect)
 	glEnd(); 
 }
 
-void circle(float x, float y)
+void render_circle_uniform_color(Ball ball)
 {
-	GLfloat radius;
-	int triangleAmount = 20;
 	GLfloat twicePi = 2.0f * PI;
 
 	glBegin(GL_TRIANGLE_FAN);
 	glColor3f(0, 1, 0);
-	radius = BALL_RAD;
 
-	glVertex2f(x, y); // center of circle
-	for(int i = 0; i <= triangleAmount; i++) {
+	glVertex2f(ball.cx, ball.cy); // center of circle
+	for(int i = 0; i <= BALL_DEF; i++) {
 		glVertex2f(
-			x + (radius*cos(i * twicePi / triangleAmount)),
-			y + (radius*2*sin(i * twicePi / triangleAmount))
+			ball.cx + (ball.r*cos(i * twicePi / BALL_DEF)),
+			ball.cy + (ball.r*2*sin(i * twicePi / BALL_DEF))
 			);
 	}
 	glEnd();
@@ -80,75 +101,86 @@ void circle(float x, float y)
 
 static float circ_x = BALL_CX;
 static float circ_y = BALL_CY;
+static float circ_dx = BALL_DIR_X;
+static float circ_dy = BALL_DIR_Y;
+
 static float lrect_y = RECT_TOP_LEFT_Y;
 static float rrect_y = RECT_TOP_LEFT_Y;
 
-void circ_mv(void)
+bool ball_has_collision_with_rect(Ball *b)
 {
-	//static bool once = true; //TODO will hace to change once rounds are implemented
-	time_t t;
-	float initial_x;
-	float initial_y;
-	srand((unsigned) time(&t));
-
-	//if (!once)
-	//{
-	initial_x = ((rand() % 6 + 6) /1000.0f);
-	initial_y = ((rand() % 3 + 4) /1000.0f);
-	//const int side = (rand() % 2);
-	//if (side)
-	//	initial_x = -initial_x;
-	//}
-	//once = false;
-
-	//printf("%f", initial_x);
-	//printf("%f", initial_y);
-	static bool is_right = false;
-	static bool is_left = false;
-	static bool is_bot = false;
-	static bool is_top = false;
-
-	if (circ_x - BALL_RAD <= -1.0f) 
-		is_left = true;
-	if (circ_x + BALL_RAD >= 1.0f)
-		is_right = true;
-	if (circ_y - BALL_RAD <= -1.0f) 
-		is_bot = true;
-	if (circ_y + BALL_RAD >= 1.0f)
-		is_top = true;
-
-	if (!is_bot) circ_y -= initial_y;
-	else if (is_bot && !is_top) circ_y += initial_y;
-	else
+	if (circ_x + b->r >= -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH)
+	{	
+		if (rrect_y - RECT_LENGTH <= b->cy && b->cy <= rrect_y) return true;
+	} else if (circ_x - b->r <= RECT_TOP_LEFT_X + RECT_WIDTH) 
 	{
-		is_top = false; 
-		is_bot = false;	
+		if (lrect_y - RECT_LENGTH <= b->cy && b->cy <= lrect_y) return true;
 	}
-	if (!is_right) circ_x += initial_x;
-	else if (is_right && !is_left) circ_x -= initial_x;
-	else
+
+	return false;
+}
+
+bool round_ended = false;
+void circ_mv(Ball *b)
+{
+	circ_x += circ_dx*b->velocity;	
+	circ_y += circ_dy*b->velocity;
+	
+	if (circ_x + b->r >= 1.0f || circ_x - b->r <= -1.0f) 
 	{
-		is_left = false; 
-		is_right = false;	
+		circ_x = 0.0f;
+		circ_y = 0.0f;
+		round_ended = true;
 	}
+	if (circ_y + b->r >= 1.0f || circ_y - b->r <= -1.0f)
+	{
+		circ_dy *= -1.0f;
+		circ_y += circ_dy*b->velocity;
+	}
+	if (ball_has_collision_with_rect(b))
+		circ_dx *= -1.0f;
+	
 	glutPostRedisplay();
 }
 
+static int buff_counter = 1;
+void TimerFunc()
+{
+	clock_t start = clock();
+    clock_t period = 2 * CLOCKS_PER_SEC;
+    clock_t elapsed;
+
+	if (round_ended == true && buff_counter == 3)
+	{
+		do {
+			elapsed = clock() - start;
+	   } while(elapsed < period);
+		round_ended = false;
+		buff_counter = 1;
+	}
+	if (buff_counter == 2)
+		buff_counter = 3;
+	if (round_ended == true && buff_counter != 3)
+		buff_counter = 2;
+}
+
 void display() 
-{ 
+{
 	glClearColor(0, 0, 0, 1);  
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	Rectangle r = make_rect(RECT_TOP_LEFT_X, lrect_y);
 	Rectangle l = make_rect(-1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y); 
 
-	circ_mv();
-	circle(circ_x, circ_y);
+	Ball game_ball = make_ball(circ_x, circ_y, BALL_RAD, BALL_SPEED);
+	circ_mv(&game_ball);
+	TimerFunc();
 
+	render_circle_uniform_color(game_ball);	
 	render_rect_uniform_color(r);
 	render_rect_uniform_color(l);
 
-	glutSwapBuffers(); 
+	glutSwapBuffers();
 }
 
 float clampf(float a)
