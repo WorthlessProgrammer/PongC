@@ -24,7 +24,7 @@
 
 #define BALL_CX 0.0f 
 #define BALL_CY 0.0f
-#define BALL_SPEED 0.007f
+#define BALL_SPEED 0.003f // 7
 #define BALL_RAD 0.02f
 #define BALL_DIR_X -0.3f
 #define BALL_DIR_Y 0.7f
@@ -124,13 +124,32 @@ bool ball_has_x_collision_with_rect(Ball *b)
 
 bool ball_has_y_collision_with_rect(Ball *b)
 {
-	if (circ_y - b->r <= lrect_y + 0.1f || circ_y + b->r <= lrect_y - RECT_LENGTH-0.1f) 
+	if (circ_x > RECT_TOP_LEFT_X && circ_x < RECT_TOP_LEFT_X + RECT_WIDTH)
 	{
-		if (circ_x > RECT_TOP_LEFT_X && circ_x < RECT_TOP_LEFT_X + RECT_WIDTH) return true;
-	} else if (circ_y - b->r <= rrect_y + 0.1f || circ_y + b->r <= rrect_y - RECT_LENGTH-0.1f) 
+		if (circ_y - b->r <= lrect_y) return true;	
+		if (circ_y + b->r <= lrect_y - RECT_LENGTH) return true;
+	} else if (circ_x < -1.0f*RECT_TOP_LEFT_X && circ_x > -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH) 
 	{
-		if (circ_x < RECT_TOP_LEFT_X && circ_x > RECT_TOP_LEFT_X - RECT_WIDTH) return true;
+		if (circ_y - b->r <= rrect_y) return true;
+		if (circ_y + b->r <= rrect_y - RECT_LENGTH) return true;
 	}
+	return false;
+}
+
+float distance(float ax, float ay, float bx, float by)
+{
+	float dx = ax - bx;
+	float dy = ay - by;
+	return sqrtf(dx*dx + dy*dy);
+}
+
+bool ball_has_corner_collision_with_rect(Ball *b)
+{
+	if (distance(circ_x, circ_y, RECT_TOP_LEFT_X + RECT_WIDTH, lrect_y) < b->r
+		|| distance(circ_x, circ_y, RECT_TOP_LEFT_X + RECT_WIDTH, lrect_y - RECT_LENGTH) < b->r
+		|| distance(circ_x, circ_y, -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y) < b->r
+		|| distance(circ_x, circ_y, -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y - RECT_LENGTH) < b->r)
+	{ return true; }
 
 	return false;
 }
@@ -145,17 +164,22 @@ void circ_mv(Ball *b)
 		circ_x = 0.0f;
 		circ_y = 0.0f;
 	}
-	if (circ_y + b->r >= 1.0f || circ_y - b->r <= -1.0f)
+	else if (circ_y + b->r >= 1.0f || circ_y - b->r <= -1.0f)
 	{
 		circ_dy *= -1.0f;
 		circ_y += circ_dy*b->velocity;
 	}
-	if (ball_has_x_collision_with_rect(b))
+	else if (ball_has_x_collision_with_rect(b))
 	{
 		circ_dx *= -1.0f;
 	}	
-	if (ball_has_y_collision_with_rect(b))
+	else if (ball_has_y_collision_with_rect(b))
 	{
+		circ_dy *= -1.0f;
+	}
+	else if (ball_has_corner_collision_with_rect(b))
+	{
+		circ_dx *= -1.0f;
 		circ_dy *= -1.0f;
 	}
 
