@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
-/* #include <unistd.h> */
 #include <math.h>
 
 #include <GL/gl.h>
+#include <GL/glut.h>
 #include <GL/freeglut.h>   
 #include <GL/freeglut_std.h>
 
@@ -24,7 +24,7 @@
 
 #define BALL_CX 0.0f 
 #define BALL_CY 0.0f
-#define BALL_SPEED 0.003f // 7
+#define BALL_SPEED 0.003f 
 #define BALL_RAD 0.02f
 #define BALL_DIR_X -0.3f
 #define BALL_DIR_Y 0.7f
@@ -71,6 +71,24 @@ Rectangle make_rect(float tl_x, float tl_y)
 	return r;
 }
 
+void myInit (void)
+{
+	// Reset background color with black (since all three argument is 0.0)
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	// Set picture color to red (in RGB model)
+	// as only argument corresponding to R (Red) is 1.0 and rest are 0.0
+	glColor3f(1.0f, 0.0f, 0.0f);
+
+	// Set width of point to one unit
+	glPointSize(1.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	// Set window size in X- and Y- direction
+	/* gluOrtho2D(-620.0, 620.0, -340.0, 340.0); */
+}
+
 void render_rect_uniform_color(Rectangle rect)
 {
 	glBegin(GL_POLYGON);
@@ -107,31 +125,33 @@ static float circ_dy = BALL_DIR_Y;
 static float lrect_y = RECT_TOP_LEFT_Y;
 static float rrect_y = RECT_TOP_LEFT_Y;
 
-bool ball_has_x_collision_with_rect(Ball *b)
+bool ball_has_x_collision_with_rect()
 {
-	if (circ_x + b->r >= -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH)
+	if (circ_x + BALL_RAD >= -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH)
 	{	
-		if (rrect_y - RECT_LENGTH <= b->cy && b->cy <= rrect_y) return true;
+		if (rrect_y - RECT_LENGTH <= circ_y && circ_y <= rrect_y) return true;
 		return false;
-	} else if (circ_x - b->r <= RECT_TOP_LEFT_X + RECT_WIDTH) 
+	} else if (circ_x - BALL_RAD <= RECT_TOP_LEFT_X + RECT_WIDTH) 
 	{
-		if (lrect_y - RECT_LENGTH <= b->cy && b->cy <= lrect_y) return true;
+		if (lrect_y - RECT_LENGTH <= circ_y && circ_y <= lrect_y) return true;
 		return false;
 	} 
 	
 	return false;
 }
 
-bool ball_has_y_collision_with_rect(Ball *b)
+bool ball_has_y_collision_with_rect()
 {
-	if (circ_x > RECT_TOP_LEFT_X && circ_x < RECT_TOP_LEFT_X + RECT_WIDTH)
+	if (circ_x >= RECT_TOP_LEFT_X && circ_x <= RECT_TOP_LEFT_X + RECT_WIDTH)
 	{
-		if (circ_y - b->r <= lrect_y) return true;	
-		if (circ_y + b->r <= lrect_y - RECT_LENGTH) return true;
-	} else if (circ_x < -1.0f*RECT_TOP_LEFT_X && circ_x > -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH) 
+		if (circ_y - BALL_RAD <= lrect_y && circ_y >= lrect_y - RECT_LENGTH) return true;	
+		else if (circ_y + BALL_RAD >= lrect_y - RECT_LENGTH && circ_y <= lrect_y) return true;
+		else return false;
+	} else if (circ_x <= -1.0f*RECT_TOP_LEFT_X && circ_x >= -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH) 
 	{
-		if (circ_y - b->r <= rrect_y) return true;
-		if (circ_y + b->r <= rrect_y - RECT_LENGTH) return true;
+		if (circ_y - BALL_RAD <= rrect_y && circ_y >= rrect_y - RECT_LENGTH) return true;
+		else if (circ_y + BALL_RAD >= rrect_y - RECT_LENGTH && circ_y <= rrect_y) return true;
+		else return false;
 	}
 	return false;
 }
@@ -143,47 +163,45 @@ float distance(float ax, float ay, float bx, float by)
 	return sqrtf(dx*dx + dy*dy);
 }
 
-bool ball_has_corner_collision_with_rect(Ball *b)
+bool ball_has_corner_collision_with_rect()
 {
-	if (distance(circ_x, circ_y, RECT_TOP_LEFT_X + RECT_WIDTH, lrect_y) < b->r
-		|| distance(circ_x, circ_y, RECT_TOP_LEFT_X + RECT_WIDTH, lrect_y - RECT_LENGTH) < b->r
-		|| distance(circ_x, circ_y, -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y) < b->r
-		|| distance(circ_x, circ_y, -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y - RECT_LENGTH) < b->r)
+	if (distance(circ_x, circ_y, RECT_TOP_LEFT_X + RECT_WIDTH, lrect_y) <= BALL_RAD
+		|| distance(circ_x, circ_y, RECT_TOP_LEFT_X + RECT_WIDTH, lrect_y - RECT_LENGTH) <= BALL_RAD
+		|| distance(circ_x, circ_y, -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y) <= BALL_RAD
+		|| distance(circ_x, circ_y, -1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y - RECT_LENGTH) <= BALL_RAD)
 	{ return true; }
 
 	return false;
 }
 
-void circ_mv(Ball *b)
+void circ_mv()
 {
-	circ_x += circ_dx*b->velocity;	
-	circ_y += circ_dy*b->velocity;
-	
-	if (circ_x + b->r >= 1.0f || circ_x - b->r <= -1.0f) 
+	circ_x += circ_dx*BALL_SPEED;	
+	circ_y += circ_dy*BALL_SPEED;
+
+	if (circ_x + BALL_RAD > 1.0f || circ_x - BALL_RAD < -1.0f) 
 	{
 		circ_x = 0.0f;
 		circ_y = 0.0f;
 	}
-	else if (circ_y + b->r >= 1.0f || circ_y - b->r <= -1.0f)
+	else if (circ_y + BALL_RAD >= 1.0f || circ_y - BALL_RAD <= -1.0f)
 	{
 		circ_dy *= -1.0f;
-		circ_y += circ_dy*b->velocity;
 	}
-	else if (ball_has_x_collision_with_rect(b))
+	else if (ball_has_x_collision_with_rect())
 	{
 		circ_dx *= -1.0f;
 	}	
-	else if (ball_has_y_collision_with_rect(b))
+	else if (ball_has_y_collision_with_rect())
 	{
+		/* printf("(%f, %f)\n", circ_x, circ_y); */
 		circ_dy *= -1.0f;
 	}
-	else if (ball_has_corner_collision_with_rect(b))
+	else if (ball_has_corner_collision_with_rect())
 	{
 		circ_dx *= -1.0f;
 		circ_dy *= -1.0f;
-	}
-
-	glutPostRedisplay();
+	} 
 }
 
 void display() 
@@ -195,13 +213,11 @@ void display()
 	Rectangle l = make_rect(-1.0f*RECT_TOP_LEFT_X - RECT_WIDTH, rrect_y); 
 
 	Ball game_ball = make_ball(circ_x, circ_y, BALL_RAD, BALL_SPEED);
-
+	
 	render_circle_uniform_color(game_ball);	
 	render_rect_uniform_color(r);
 	render_rect_uniform_color(l);
 
-	circ_mv(&game_ball);		
-	
 	glutSwapBuffers(); 
 }
 
@@ -227,6 +243,7 @@ void keyboard_handler(unsigned char key, int x, int y)
 		default: break;
 	}
 	
+	circ_mv();	
 	glutPostRedisplay();
 }
 
@@ -234,6 +251,11 @@ void init_random()
 {
 	time_t t;
 	srand((unsigned) time(&t));
+}
+
+void redraw() {
+	circ_mv();		
+	glutPostRedisplay();
 }
 
 int main(int argc, char** argv) 
@@ -244,10 +266,12 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Use single color buffer and no depth buffer.
 	glutInitWindowSize(WIDTH, HEIGHT);			// Size of display area, in pixels.
 	glutInitWindowPosition(WIN_POS_X, WIN_POS_Y);	// Location of window in screen coordinates.
-	glutCreateWindow("PongC");				// Parameter is window title. 
-	glutDisplayFunc(display);				// Called when the window needs to be redrawn.
-	glutKeyboardFunc(keyboard_handler);
+	glutCreateWindow("PongC");				// Parameter is window title. 	
+	glutDisplayFunc(display);				// Called when the window needs to be redrawn.	
+	glutKeyboardFunc(keyboard_handler);	
+	glutIdleFunc(redraw);
 
+	myInit();
 	glutMainLoop(); // Run the event loop!	This function does not return.
 					// Program ends when user closes the window.
 	return 0;
